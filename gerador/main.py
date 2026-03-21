@@ -2,6 +2,6 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-@app.get("/")
-def home():
-    return "hello world"
+from gen_routes import gen_router
+
+app.include_router(gen_router)
