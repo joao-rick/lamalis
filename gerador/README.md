@@ -16,3 +16,8 @@ Lib para conexão com protocolo AMQP
 
 cmd:
 *pip install pika*
+
+### Gerar requiriments:
+
+cmd:
+*pip freeze > requirements.txt*
