@@ -1,12 +1,12 @@
-FROM python:3.9.13-slim AS runtime
+FROM python:3.9.13
 
-COPY gerador /app/gerador
+COPY . /app/
 
-WORKDIR /app/gerador
+WORKDIR /app/
 
-RUN pip install --no-cache-dir -r gerador/requirements.txt
+RUN pip install -r requirements.txt
 
-CMD ["python", "gerador/publisher.py"]
+CMD ["python", "publisher.py"]
 
-#docker build -t gerarador:1.0 /gerador
-#docker run gerarador:1.0
+#docker build -t gerador:1.0 /gerador
+#docker run gerador:1.0
