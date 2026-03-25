@@ -4,19 +4,19 @@ from typing import Dict
 
 import pika
 from dotenv import load_dotenv
-from pika.exceptions import AMQPConnectionError
+from pika.exceptions import AMQPConnectionError, ProbableAuthenticationError
 
 from gen_routes import build_cripto_payload
 
-load_dotenv()
+load_dotenv(override=True)
 
 class RabbitmqPublisher:
     def __init__(self) -> None:
         self.host = os.getenv('HOST', 'localhost')
         self.port = int(os.getenv('PORT', 5672))
-        self.username = os.getenv('USERNAME', 'guest')
-        self.password = os.getenv('PASSWORD', 'guest')
-        self.exchange = os.getenv('EXCHANGE', '')
+        self.username = os.getenv('RABBITMQ_USERNAME', 'guest')
+        self.password = os.getenv('RABBITMQ_PASSWORD', 'guest')
+        self.exchange = os.getenv('EXCHANGE', 'lamalis_exchange')
         self.routing_key = os.getenv('ROUTING_KEY', '')
         self.channel = self.__create_channel()
     
@@ -37,6 +37,11 @@ class RabbitmqPublisher:
             else:
                 channel.queue_declare(queue=self.routing_key, durable=True)
             return channel
+        except ProbableAuthenticationError as exc:
+            raise RuntimeError(
+                f"Falha de autenticacao no RabbitMQ em {self.host}:{self.port}. "
+                "Verifique USERNAME/PASSWORD no .env e as credenciais configuradas no broker."
+            ) from exc
         except AMQPConnectionError as exc:
             raise RuntimeError(
                 f"Nao foi possivel conectar ao RabbitMQ em {self.host}:{self.port}. "

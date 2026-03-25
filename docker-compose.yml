@@ -1,0 +1,42 @@
+networks:
+  lamalis:
+    driver: bridge
+
+volumes:
+  rabbitmq_data: {}
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/data/rabbitmq
+    restart: unless-stopped
+    networks:
+      - lamalis
+
+  gerador:
+    build: ./gerador
+    container_name: gerador
+    depends_on:
+      - rabbitmq
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - HOST=rabbitmq
+      - PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - EXCHANGE=lamalis_exchange
+      - ROUTING_KEY=
+    networks:
+      - lamalis
+      
