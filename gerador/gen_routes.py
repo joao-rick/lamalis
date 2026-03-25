@@ -3,15 +3,19 @@ from generator import geraCoin, geraValorAtual, geraValorInicial, geraNivelRisco
 
 gen_router = APIRouter(prefix="/v1", tags=["generator"])
 
+def build_cripto_payload():
+    coin_gerada = geraCoin()
+    nome_criptomoeda = "".join(coin_gerada[0])
+
+    return {
+        "nome_criptomoeda": nome_criptomoeda,
+        "sigla": geraSigla(nome_criptomoeda),
+        "valor_atual": geraValorAtual(),
+        "valor_inicial": geraValorInicial(),
+        "nivel_risco": geraNivelRisco(),
+    }
+
+
 @gen_router.get("/cripto")
 async def generate_cripto():
-	coin_gerada = geraCoin()
-	nome_criptomoeda = "".join(coin_gerada[0])
-
-	return {
-		"nome_criptomoeda": nome_criptomoeda,
-		"sigla": geraSigla(nome_criptomoeda),
-		"valor_atual": geraValorAtual(),
-		"valor_inicial": geraValorInicial(),
-		"nivel_risco": geraNivelRisco(),
-	}
+    return build_cripto_payload()
