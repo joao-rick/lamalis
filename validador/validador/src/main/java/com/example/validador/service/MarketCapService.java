@@ -1,6 +1,9 @@
 package com.example.validador.service;
 
 import com.example.validador.dto.CriptoDTO;
+import com.example.validador.model.RegraValidacao;
+import com.example.validador.repository.RegraRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,22 +11,30 @@ import java.util.Map;
 @Service
 public class MarketCapService {
 
+    @Autowired
+    private RegraRepository repository;
+
     public Map<String, Object> processarAnalise(CriptoDTO dados) {
-        // Cálculo do percentual de valorização
+        RegraValidacao regraLC = repository.findByCategoria("LC");
+        RegraValidacao regraMC = repository.findByCategoria("MC");
+
         double variacao = ((dados.getValorAtual() - dados.getValorInicial()) / dados.getValorInicial()) * 100;
 
+        String categoriaResultado;
+
         // Classificação de Market Cap
-        String categoria;
-        if (dados.getValorAtual() > 80000 || "Low".equalsIgnoreCase(dados.getNivelRisco())) {
-            categoria = "LC (Large Cap)";
-        } else if (dados.getValorAtual() > 40000) {
-            categoria = "MC (Mid Cap)";
-        } else {
-            categoria = "SC (Small Cap)";
+        if (dados.getValorAtual() > regraLC.getValorMinimo() || "Low".equalsIgnoreCase(dados.getNivelRisco())) {
+            categoriaResultado = "LC (Large Cap)";
+        }
+        else if (dados.getValorAtual() > regraMC.getValorMinimo()) {
+            categoriaResultado = "MC (Mid Cap)";
+        }
+        else {
+            categoriaResultado = "SC (Small Cap)";
         }
 
         Map<String, Object> resultado = new HashMap<>();
-        resultado.put("marketCap", categoria);
+        resultado.put("marketCap", categoriaResultado);
         resultado.put("valorizacaoPercentual", String.format("%.2f%%", variacao));
 
         return resultado;

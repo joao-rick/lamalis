@@ -22,6 +22,18 @@ services:
     networks:
       - lamalis
 
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=lamalis_db
+    ports:
+      - "5432:5432"
+    networks:
+      - lamalis
+
   gerador:
     build: ./gerador
     container_name: gerador
@@ -45,6 +57,7 @@ services:
     container_name: validador
     depends_on:
       - rabbitmq
+      - postgres
     ports:
       - "8080:8080"
     restart: unless-stopped
