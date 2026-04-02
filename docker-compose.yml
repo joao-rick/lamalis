@@ -39,4 +39,20 @@ services:
       - ROUTING_KEY=
     networks:
       - lamalis
+
+  validador:
+    build: ./validador/validador
+    container_name: validador
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    networks:
+      - lamalis
       
